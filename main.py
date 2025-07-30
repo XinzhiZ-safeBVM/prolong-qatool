@@ -56,11 +56,20 @@ def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "
         standard_filename = f"auto_breath_table_{input_filename}.csv"
         export_standard_csv(qa_table_cleaned, standard_filename, str(output_path))
         
-        # Step 3: Generate HTML report from the standard CSV
-        print("\n5. Generating HTML report...")
+        # Step 3: Extract total recording time from real_data_df
+        print("\n5. Extracting total recording time...")
+        total_time_seconds = None
+        if 'Time' in real_data_df.columns:
+            time_data = pd.to_numeric(real_data_df.iloc[2:]['Time'], errors='coerce').dropna()
+            if len(time_data) > 0:
+                total_time_seconds = time_data.max()
+                print(f"Total recording time: {total_time_seconds:.2f} seconds")
+        
+        # Step 4: Generate HTML report from the standard CSV
+        print("\n6. Generating HTML report...")
         csv_file_path = output_path / standard_filename
         df = pd.read_csv(csv_file_path)
-        results = analyze_vt_distribution(df, column=DEFAULT_COLUMN, ranges=DEFAULT_RANGES)
+        results = analyze_vt_distribution(df, column=DEFAULT_COLUMN, ranges=DEFAULT_RANGES, total_time_seconds=total_time_seconds)
         
         session_id = f"Session_{input_filename}"
         html_output_path = output_path / f"vt_report_{input_filename}.html"
@@ -80,7 +89,7 @@ def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "
 def main():
     # Example raw file path - update this with your actual file
     # Test with SOTAIRIQ format
-    raw_file_path = "rawfile_sample/SN2521500437_48_(newlotbluelung)_250717Z181901T.csv"
+    raw_file_path = "rawfile_sample/testrecordingwithFitbitAlex_250730Z165449T.csv"
     # Test with Sensirion format
     # raw_file_path = "rawfile_sample/001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv"
     

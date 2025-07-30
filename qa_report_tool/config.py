@@ -1,2 +1,2 @@
-DEFAULT_RANGES = [(None, 400), (400, 500), (500, 600), (600, None)]
+DEFAULT_RANGES = [(None, 300), (300, 400), (400, 600), (600, 700), (700, None)]
 DEFAULT_COLUMN = "Inhaled Tidal Volume"

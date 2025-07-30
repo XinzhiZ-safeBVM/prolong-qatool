@@ -132,7 +132,7 @@ def read_raw_file(filepath: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFra
     try:
         # Read first few lines to detect format
         with open(filepath, 'r', encoding='utf-8') as file:
-            lines = file.readlines()[:50]  # Read first 50 lines for detection
+            lines = file.readlines()[:1000]  # Read first 1000 lines for detection
         
         file_content = ''.join(lines)
         
