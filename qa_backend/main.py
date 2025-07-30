@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from file_io import read_sensirion_file
+from file_io import read_raw_file
 from qa_processing import generate_qa_breath_table, check_qa_table
 from csv_export import (
     export_standard_csv, export_developer_csv, 
@@ -15,10 +15,10 @@ from csv_export import (
 
 def analyze_respiratory_data(input_file: str, output_dir: Optional[str] = None) -> bool:
     """
-    Analyze respiratory data from a Sensirion file and generate QA reports.
+    Analyze respiratory data from a raw data file (auto-detects Sensirion or SOTAIRIQ format) and generate QA reports.
     
     Args:
-        input_file (str): Path to the input Sensirion CSV file
+        input_file (str): Path to the input raw data CSV file (Sensirion or SOTAIRIQ format)
         output_dir (Optional[str]): Output directory for results. If None, uses input file directory
         
     Returns:
@@ -35,9 +35,9 @@ def analyze_respiratory_data(input_file: str, output_dir: Optional[str] = None) 
         print(f"Analyzing file: {input_file}")
         print(f"Output directory: {output_path}")
         
-        # Step 1: Read the Sensirion file
-        print("\n1. Reading Sensirion file...")
-        header_df, breath_table_df, real_data_df = read_sensirion_file(input_file)
+        # Step 1: Read the raw data file (auto-detect format)
+        print("\n1. Reading raw data file...")
+        header_df, breath_table_df, real_data_df = read_raw_file(input_file)
         
         if real_data_df.empty:
             print("Error: No real data found in the file")
@@ -99,7 +99,10 @@ def main():
     Main function to run respiratory data analysis.
     """
     # Example usage - replace with your actual file path
-    raw_file_path = r"E:\Xin-safeBVM\Research\DoD_Brady\20250125provider001\001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv"
+    # Test with SOTAIRIQ format
+    raw_file_path = "../rawfile_sample/SN2521500437_48_(newlotbluelung)_250717Z181901T.csv"
+    # Test with Sensirion format
+    # raw_file_path = "../rawfile_sample/001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv"
     
     # Check if file exists
     if not Path(raw_file_path).exists():

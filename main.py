@@ -5,16 +5,16 @@ from qa_report_tool.report_html import render_html_report
 from qa_report_tool.config import DEFAULT_RANGES, DEFAULT_COLUMN
 
 # Import qa_backend modules using proper module path
-from qa_backend.file_io import read_sensirion_file
+from qa_backend.file_io import read_raw_file
 from qa_backend.qa_processing import generate_qa_breath_table, check_qa_table
 from qa_backend.csv_export import export_standard_csv
 
 def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "output") -> bool:
     """
-    Process raw Sensirion CSV file through qa_backend and generate HTML report.
+    Process raw data CSV file (auto-detects Sensirion or SOTAIRIQ format) through qa_backend and generate HTML report.
     
     Args:
-        raw_file_path (str): Path to the raw Sensirion CSV file
+        raw_file_path (str): Path to the raw data CSV file (Sensirion or SOTAIRIQ format)
         output_dir (str): Output directory for results
         
     Returns:
@@ -29,8 +29,8 @@ def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "
         print(f"Output directory: {output_path}")
         
         # Step 1: Process through qa_backend
-        print("\n1. Reading Sensirion file...")
-        header_df, breath_table_df, real_data_df = read_sensirion_file(raw_file_path)
+        print("\n1. Reading raw data file (auto-detecting format)...")
+        header_df, breath_table_df, real_data_df = read_raw_file(raw_file_path)
         
         if real_data_df.empty:
             print("Error: No real data found in the file")
@@ -79,7 +79,10 @@ def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "
 
 def main():
     # Example raw file path - update this with your actual file
-    raw_file_path = r"your/path/to/rawfile.csv"
+    # Test with SOTAIRIQ format
+    raw_file_path = "rawfile_sample/SN2521500437_48_(newlotbluelung)_250717Z181901T.csv"
+    # Test with Sensirion format
+    # raw_file_path = "rawfile_sample/001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv"
     
     # Check if file exists
     if not Path(raw_file_path).exists():
