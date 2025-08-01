@@ -305,8 +305,8 @@ if __name__ == "__main__":
     
     # Test files
     test_files = [
-        "../rawfile_sample/AJVs_250603Z154510T.csv",  # SOTAIRIQ format
-        "../rawfile_sample/001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv"  # Sensirion format
+        "../rawfile_sample/sotairsample.csv",  # SOTAIRIQ format
+        "../rawfile_sample/sensirionsample.csv"  # Sensirion format
     ]
     
     import os

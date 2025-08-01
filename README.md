@@ -1,16 +1,18 @@
 # Respiratory Data Analysis & QA Report Tool
 
-A comprehensive Python toolkit for analyzing respiratory data from Sensirion devices, generating quality assurance (QA) breath tables, and creating detailed HTML reports with tidal volume distribution analysis.
+A comprehensive Python toolkit for analyzing respiratory data from multiple device formats, generating quality assurance (QA) breath tables, and creating detailed HTML reports with tidal volume distribution analysis.
 
 ## 🚀 Features
 
-- **Complete End-to-End Pipeline**: Raw Sensirion CSV → QA Analysis → Standard CSV → HTML Report
+- **Complete End-to-End Pipeline**: Raw CSV → QA Analysis → Standard CSV → HTML Report
+- **Multi-Format Support**: Auto-detects Sensirion and SOTAIRIQ file formats
 - **Modular Architecture**: Separate packages for backend processing and report generation
 - **Breath Detection & Analysis**: Advanced algorithms for detecting breath phases and calculating respiratory metrics
 - **Quality Assurance**: Automated validation and cleaning of breath data
 - **Multiple Output Formats**: Standard CSV, Developer CSV, and interactive HTML reports
 - **SOTAIR Analysis**: Specialized analysis for SOTAIR activation detection
 - **Configurable Parameters**: Easily adjustable thresholds and settings
+- **Breaths Per Minute Calculation**: Accurate BPM calculation using total recording time
 
 ## 📁 Project Structure
 
@@ -44,19 +46,57 @@ prolong-qatool/
 
 ### Option 1: Integrated Pipeline (Recommended)
 
-Process raw Sensirion data and generate complete analysis in one step:
+Process raw respiratory data and generate complete analysis in one step:
+
+#### Step 1: Configure Your Data File
+
+Edit the `raw_file_path` variable in `main.py` to point to your data file:
 
 ```python
-# Edit main.py to set your file path
-raw_file_path = r"path/to/your/sensirion_file.csv"
+# In main.py, update this line (around line 91):
+raw_file_path = "rawfile_sample/your_data_file.csv"
 
-# Run the integrated pipeline
+# Examples of supported file paths:
+# For SOTAIRIQ format:
+raw_file_path = "rawfile_sample/sotairsample.csv"
+
+# For Sensirion format:
+raw_file_path = "rawfile_sample/sensirionsample.csv"
+
+# Absolute paths also work:
+raw_file_path = r"C:\Users\YourName\Documents\respiratory_data.csv"
+```
+
+#### Step 2: Run the Pipeline
+
+```bash
 python main.py
 ```
 
 **Output:**
 - `output/auto_breath_table_[filename].csv` - Standard CSV format
-- `output/vt_report_[filename].html` - Interactive HTML report
+- `output/vt_report_[filename].html` - Interactive HTML report with BPM calculation
+
+### Supported File Formats
+
+The tool automatically detects and processes two main formats:
+
+#### SOTAIRIQ Format
+- **File naming**: Usually ends with timestamp like `_250730Z142300T.csv`
+- **Structure**: Contains `ts_ms`, `in_flow_vol_ml`, `ex_vol_ml`, etc.
+- **Example**: `testAlex_250730Z142300T.csv`
+
+#### Sensirion Format  
+- **File naming**: Often includes date/time like `001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv`
+- **Structure**: Contains `Time`, `Flow`, `Pressure`, etc.
+- **Example**: `001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv`
+
+### File Path Configuration Tips
+
+1. **Relative Paths**: Place your data files in the `rawfile_sample/` folder for easy access
+2. **Absolute Paths**: Use full paths like `C:\Data\myfile.csv` for files outside the project
+3. **Path Separators**: Use forward slashes `/` or raw strings `r"path\to\file.csv"` on Windows
+4. **File Validation**: The tool will check if the file exists before processing
 
 ### Option 2: QA Backend Only
 
@@ -74,21 +114,35 @@ python main.py
 ### Option 3: Programmatic Usage
 
 ```python
-from qa_backend.file_io import read_sensirion_file
+import pandas as pd
+from qa_backend.file_io import read_raw_file
 from qa_backend.qa_processing import generate_qa_breath_table, check_qa_table
 from qa_backend.csv_export import export_standard_csv
 from qa_report_tool.analysis import analyze_vt_distribution
 from qa_report_tool.report_html import render_html_report
+from qa_report_tool.config import DEFAULT_RANGES, DEFAULT_COLUMN
 
-# Read and process data
-header_df, breath_table_df, real_data_df = read_sensirion_file("data.csv")
+# Read and process data (auto-detects format)
+header_df, breath_table_df, real_data_df = read_raw_file("data.csv")
 qa_table = generate_qa_breath_table(real_data_df)
 qa_table_cleaned = check_qa_table(qa_table)
 
+# Extract total recording time for BPM calculation
+total_time_seconds = None
+if 'Time' in real_data_df.columns:
+    time_data = pd.to_numeric(real_data_df.iloc[2:]['Time'], errors='coerce').dropna()
+    if len(time_data) > 0:
+        total_time_seconds = time_data.max()
+
 # Export and analyze
 export_standard_csv(qa_table_cleaned, "output.csv", "output/")
-results = analyze_vt_distribution(pd.read_csv("output/output.csv"))
-render_html_report(results, ranges, "session_id", "report.html")
+results = analyze_vt_distribution(
+    pd.read_csv("output/output.csv"), 
+    column=DEFAULT_COLUMN, 
+    ranges=DEFAULT_RANGES,
+    total_time_seconds=total_time_seconds
+)
+render_html_report(results, DEFAULT_RANGES, "session_id", "report.html")
 ```
 
 ## 📊 Output Formats
@@ -104,10 +158,11 @@ render_html_report(results, ranges, "session_id", "report.html")
 - **SOTAIR Activation**: SOTAIR flag (0/1)
 
 ### HTML Report Features
-- **Summary Statistics**: Total breaths, min/max tidal volumes
-- **Distribution Analysis**: Percentage of breaths in configurable ranges
-- **Interactive Charts**: Plotly-powered visualizations
+- **Summary Statistics**: Total breaths, breaths per minute, min/max tidal volumes
+- **Distribution Analysis**: Percentage of breaths in configurable ranges (including <400mL and >600mL)
+- **Interactive Charts**: Plotly-powered visualizations with bar chart at the top
 - **Session Tracking**: Unique session IDs for report management
+- **Accurate BPM**: Calculated using total recording time from source data
 
 ## ⚙️ Configuration
 
@@ -203,4 +258,4 @@ For questions or issues:
 
 ---
 
-**Note**: This tool is designed specifically for Sensirion respiratory data files. Ensure your input data follows the expected CSV format with Time, Timestamp, Flow, and Pressure columns.
+**Note**: This tool supports both Sensirion and SOTAIRIQ respiratory data formats. The system automatically detects the file format and processes accordingly. Ensure your input data follows one of the supported CSV formats with appropriate time, flow, and pressure columns.

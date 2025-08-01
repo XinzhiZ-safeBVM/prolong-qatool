@@ -89,9 +89,9 @@ def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "
 def main():
     # Example raw file path - update this with your actual file
     # Test with SOTAIRIQ format
-    raw_file_path = "rawfile_sample/testrecordingwithFitbitAlex_250730Z165449T.csv"
+    raw_file_path = "rawfile_sample/yoursampledatahere.csv"
     # Test with Sensirion format
-    # raw_file_path = "rawfile_sample/001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv"
+    # raw_file_path = "rawfile_sample/sampledatahere.csv"
     
     # Check if file exists
     if not Path(raw_file_path).exists():

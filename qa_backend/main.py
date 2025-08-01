@@ -100,9 +100,9 @@ def main():
     """
     # Example usage - replace with your actual file path
     # Test with SOTAIRIQ format
-    raw_file_path = "../rawfile_sample/SN2521500437_48_(newlotbluelung)_250717Z181901T.csv"
+    raw_file_path = "../rawfile_sample/sotairsample.csv"
     # Test with Sensirion format
-    # raw_file_path = "../rawfile_sample/001-1HR-20250125_07h14m51s_AM_-0800_52m26s.csv"
+    # raw_file_path = "../rawfile_sample/sensirionsample.csv"
     
     # Check if file exists
     if not Path(raw_file_path).exists():

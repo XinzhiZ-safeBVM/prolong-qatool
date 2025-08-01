@@ -1,6 +1,6 @@
-# Restructured Respiratory Data Analysis Tool
+# QA Backend - Respiratory Data Analysis Tool
 
-This is a restructured and improved version of the respiratory data analysis tool, organized into modular, maintainable Python code following best practices.
+A modular backend system for respiratory data analysis that supports multiple device formats (Sensirion and SOTAIRIQ), organized into maintainable Python modules following best practices.
 
 ## 📁 Project Structure
 
@@ -22,12 +22,12 @@ restructured/
 ### Basic Usage
 
 ```python
-from file_io import read_sensirion_file
+from file_io import read_raw_file
 from qa_processing import generate_qa_breath_table, check_qa_table
 from csv_export import export_standard_csv
 
-# Read data
-header_df, breath_table_df, real_data_df = read_sensirion_file("your_file.csv")
+# Read data (auto-detects Sensirion or SOTAIRIQ format)
+header_df, breath_table_df, real_data_df = read_raw_file("your_file.csv")
 
 # Generate QA table
 qa_table = generate_qa_breath_table(real_data_df)
@@ -39,24 +39,49 @@ export_standard_csv(qa_table_clean, "output.csv", "output_dir/")
 
 ### Running the Main Script
 
+#### Step 1: Configure Your Data File
+
+Edit the `raw_file_path` variable in `main.py` (around line 100):
+
+```python
+# For SOTAIRIQ format:
+raw_file_path = "../rawfile_sample/sotairiqsample.csv"
+
+# For Sensirion format:
+raw_file_path = "../rawfile_sample/sensirionsample.csv"
+
+# Absolute paths also work:
+raw_file_path = r"C:\Users\YourName\Documents\respiratory_data.csv"
+```
+
+#### Step 2: Run the Analysis
+
 ```bash
 python main.py
 ```
 
-*Note: Update the `raw_file_path` variable in `main.py` with your actual data file path.*
+### Supported File Formats
+
+The backend automatically detects and processes:
+
+- **SOTAIRIQ Format**: Files with `ts_ms`, `in_flow_vol_ml`, `ex_vol_ml` columns
+- **Sensirion Format**: Files with `Time`, `Flow`, `Pressure` columns
 
 ## 📋 Module Documentation
 
 ### 1. `file_io.py` - File Input/Output
 
 **Main Functions:**
-- `read_sensirion_file(filepath)` - Reads Sensirion CSV files and returns header, breath table, and real data DataFrames
+- `read_raw_file(filepath)` - Auto-detects and reads Sensirion or SOTAIRIQ CSV files
+- `read_sensirion_file(filepath)` - Specifically reads Sensirion format files
+- `read_sotairiq_file(filepath)` - Specifically reads SOTAIRIQ format files
 
 **Features:**
-- Automatic file format detection
-- Data type conversion
+- Automatic file format detection (Sensirion vs SOTAIRIQ)
+- Multi-format data type conversion
+- Time column standardization (converts ts_ms to Time in seconds)
 - TSI device detection and warnings
-- Error handling for file operations
+- Comprehensive error handling for file operations
 
 ### 2. `breath_detection.py` - Breath Detection Algorithms
 
@@ -211,9 +236,10 @@ Includes all available metrics:
 ### Common Issues
 
 1. **File Not Found Error**
-   - Check file path is correct
+   - Check file path is correct in main.py (around line 100)
    - Ensure file exists and is accessible
    - Use raw strings for Windows paths: `r"C:\path\to\file.csv"`
+   - For relative paths, place files in `../rawfile_sample/` directory
 
 2. **No Breaths Detected**
    - Check data quality and format
@@ -256,10 +282,10 @@ Example migration:
 header_PD, breath_table_PD, real_data_PD = ReadSensirionFile(filepath)
 QA_table = generate_qa_breath_table(real_data_PD)
 
-# New code
-from file_io import read_sensirion_file
+# New code (with multi-format support)
+from file_io import read_raw_file
 from qa_processing import generate_qa_breath_table
 
-header_df, breath_table_df, real_data_df = read_sensirion_file(filepath)
+header_df, breath_table_df, real_data_df = read_raw_file(filepath)  # Auto-detects format
 qa_table = generate_qa_breath_table(real_data_df)
 ```
