@@ -1,3 +1,23 @@
+# Python cache files
 __pycache__/
 *.pyc
+
+# Generated HTML reports
 *.html
+
+# PyInstaller build artifacts
+build/
+dist/
+*.spec
+version.txt
+*.exe
+*.manifest
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
