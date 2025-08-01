@@ -21,13 +21,13 @@ prolong-qatool/
 ├── main.py                    # Integrated pipeline (Raw CSV → HTML Report)
 ├── gui_main.py               # GUI application with tkinter interface
 ├── GUI_README.md             # GUI usage documentation
-├── BUILD_README.md           # Executable build documentation
+├── SETUP_GUIDE.md            # Complete setup & build guide
 ├── requirements.txt          # Python dependencies
 ├── build_exe.py              # PyInstaller build script
 ├── build.bat                 # Windows build batch file
 ├── qa_backend/                # Core respiratory data processing
 │   ├── main.py               # Standalone QA analysis tool
-│   ├── file_io.py            # Sensirion file reading
+│   ├── file_io.py            # Multi-format file reading (Sensirion/SOTAIRIQ)
 │   ├── breath_detection.py   # Breath detection algorithms
 │   ├── calculations.py       # Volume, flow, and SOTAIR calculations
 │   ├── qa_processing.py      # QA table generation and validation
@@ -37,16 +37,37 @@ prolong-qatool/
 │   ├── analysis.py           # Tidal volume distribution analysis
 │   ├── report_html.py        # HTML report rendering
 │   └── config.py             # Report configuration
-└── output/                   # Generated outputs
+└── rawfile_sample/           # Sample CSV files for testing
+    ├── [Sensirion format samples]
+    └── [SOTAIRIQ format samples]
 ```
 
 ## 🛠️ Installation
 
-### Prerequisites
-- TBD
+### Quick Start
+See [SETUP_GUIDE.md](SETUP_GUIDE.md) for complete step-by-step instructions including:
+- Conda environment setup
+- Dependency installation
+- Building executables
+- Distribution guide
 
-### Setup
-- TBD
+### Prerequisites
+- Python 3.12 (Anaconda/Miniconda recommended)
+- Git (for version tracking)
+- Windows 10/11
+
+### Quick Setup
+```bash
+# Create conda environment
+conda create -n prolong-report-tool python=3.12
+conda activate prolong-report-tool
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Test the application
+python gui_main.py
+```
 
 ## 📖 Usage
 
@@ -81,7 +102,7 @@ build.bat
 python build_exe.py
 ```
 
-See [BUILD_README.md](BUILD_README.md) for detailed build instructions and distribution guide.
+See [SETUP_GUIDE.md](SETUP_GUIDE.md) for detailed build instructions and distribution guide.
 
 ### Option 2: Integrated Pipeline (Command Line)
 
