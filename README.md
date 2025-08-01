@@ -19,6 +19,12 @@ A comprehensive Python toolkit for analyzing respiratory data from multiple devi
 ```
 prolong-qatool/
 ├── main.py                    # Integrated pipeline (Raw CSV → HTML Report)
+├── gui_main.py               # GUI application with tkinter interface
+├── GUI_README.md             # GUI usage documentation
+├── BUILD_README.md           # Executable build documentation
+├── requirements.txt          # Python dependencies
+├── build_exe.py              # PyInstaller build script
+├── build.bat                 # Windows build batch file
 ├── qa_backend/                # Core respiratory data processing
 │   ├── main.py               # Standalone QA analysis tool
 │   ├── file_io.py            # Sensirion file reading
@@ -44,7 +50,40 @@ prolong-qatool/
 
 ## 📖 Usage
 
-### Option 1: Integrated Pipeline (Recommended)
+### Option 1: GUI Application (Easiest)
+
+Use the graphical user interface for the simplest experience:
+
+```bash
+python gui_main.py
+```
+
+**Features:**
+- File picker to select CSV files
+- One-click analysis with "Run Analysis" button
+- Real-time processing output display
+- Automatic HTML report opening in browser
+- Version tracking with git commit hash
+- Smart output location (creates `html_report` folder next to CSV file)
+- User-friendly interface with progress tracking
+
+See [GUI_README.md](GUI_README.md) for detailed GUI usage instructions.
+
+### Building Standalone Executable
+
+Create a standalone .exe file for distribution:
+
+```bash
+# Quick build (Windows)
+build.bat
+
+# Or manual build
+python build_exe.py
+```
+
+See [BUILD_README.md](BUILD_README.md) for detailed build instructions and distribution guide.
+
+### Option 2: Integrated Pipeline (Command Line)
 
 Process raw respiratory data and generate complete analysis in one step:
 
