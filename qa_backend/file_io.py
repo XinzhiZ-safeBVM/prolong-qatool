@@ -132,13 +132,13 @@ def read_raw_file(filepath: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFra
     try:
         # Read first few lines to detect format
         with open(filepath, 'r', encoding='utf-8') as file:
-            lines = file.readlines()[:1000]  # Read first 1000 lines for detection
+            lines = file.readlines()[:50]  # Read first 1000 lines for detection
         
         file_content = ''.join(lines)
         
         # Check for new SOTAIRIQ format indicators
         if ('breaths,time_s,bpm' in file_content and 
-            'ts_ms,flow_slm,press_cmH2O,trig' in file_content):
+            'breath,ts_ms,in_flow_time_s,in_flow_vol_ml,ex_vol_ml,pk_flow_slm,p_press_cmH2O' in file_content):
             print(f"Detected new SOTAIRIQ format for file: {filepath}")
             return read_sotairiq_file(filepath)
         
@@ -210,6 +210,12 @@ def read_sotairiq_file(filepath: str) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Da
         # Process breath table to add Time column
         if not breath_table_df.empty and 'ts_ms' in breath_table_df.columns:
             breath_table_df['Time'] = breath_table_df['ts_ms'] / 1000.0
+        
+        # Check for multiple '1' values in breath column
+        if not breath_table_df.empty and 'breath' in breath_table_df.columns:
+            breath_ones_count = (breath_table_df['breath'] == 1).sum()
+            if breath_ones_count > 1:
+                raise ValueError(f"Raw data file is not correctly recorded: found {breath_ones_count} occurrences of breath '1' in breath table, expected only 1")
         
         return header_df, breath_table_df, raw_data_df
         
