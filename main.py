@@ -9,7 +9,7 @@ from qa_backend.file_io import read_raw_file
 from qa_backend.qa_processing import generate_qa_breath_table, check_qa_table
 from qa_backend.csv_export import export_standard_csv
 
-def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "output") -> bool:
+def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "output") -> tuple[bool, str]:
     """
     Process raw data CSV file (auto-detects Sensirion or SOTAIRIQ format) through qa_backend and generate HTML report.
     
@@ -80,11 +80,12 @@ def process_raw_data_and_generate_report(raw_file_path: str, output_dir: str = "
         print(f"   - Standard CSV: {csv_file_path}")
         print(f"   - HTML Report: {html_output_path}")
         
-        return True
+        return True, "Processing completed successfully"
         
     except Exception as e:
-        print(f"\nError during processing: {str(e)}")
-        return False
+        error_msg = f"Error during processing: {str(e)}"
+        print(f"\n{error_msg}")
+        return False, error_msg
 
 def main():
     # Example raw file path - update this with your actual file
@@ -100,7 +101,7 @@ def main():
         return
     
     # Process the file and generate report
-    success = process_raw_data_and_generate_report(raw_file_path)
+    success, message = process_raw_data_and_generate_report(raw_file_path)
     
     if not success:
         print("Processing failed!")

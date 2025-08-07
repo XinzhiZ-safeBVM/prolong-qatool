@@ -6,6 +6,8 @@ from pathlib import Path
 import sys
 import os
 import subprocess
+import datetime
+import traceback
 
 # Import the main processing function
 from main import process_raw_data_and_generate_report
@@ -193,7 +195,7 @@ class ProlongReportToolGUI:
             sys.stdout = OutputCapture(self)
             
             # Run the analysis with custom output directory
-            success = process_raw_data_and_generate_report(file_path, str(output_dir))
+            success, error_details = process_raw_data_and_generate_report(file_path, str(output_dir))
             
             # Restore stdout
             sys.stdout = original_stdout
@@ -207,15 +209,65 @@ class ProlongReportToolGUI:
             else:
                 self.log_output("\n" + "=" * 50)
                 self.log_output("✗ Analysis failed!")
-                messagebox.showerror("Error", "Analysis failed. Check the output for details.")
+                
+                # Create error log file with specific error details
+                self.create_error_log(file_path, str(output_dir), error_details)
+                
+                messagebox.showerror("Error", f"Analysis failed: {error_details}")
                 
         except Exception as e:
             self.log_output(f"\nError: {str(e)}")
+            
+            # Create detailed error log file
+            error_details = f"Exception: {str(e)}\n\nTraceback:\n{traceback.format_exc()}"
+            self.create_error_log(file_path, str(output_dir), error_details)
+            
             messagebox.showerror("Error", f"An error occurred: {str(e)}")
         finally:
             # Restore stdout if it was changed
             sys.stdout = original_stdout
             self.set_processing_state(False)
+    
+    def create_error_log(self, file_path, output_dir, error_details):
+        """Create an error log file with detailed error information"""
+        try:
+            # Ensure output directory exists
+            output_path = Path(output_dir)
+            output_path.mkdir(parents=True, exist_ok=True)
+            
+            # Generate error log filename with timestamp
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            input_filename = Path(file_path).stem
+            error_log_filename = f"error_log_{input_filename}_{timestamp}.txt"
+            error_log_path = output_path / error_log_filename
+            
+            # Collect system and file information
+            system_info = f"""Error Log - Prolong Report Tool
+{'=' * 50}
+Timestamp: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+Input File: {file_path}
+Output Directory: {output_dir}
+Git Version: {self.git_hash[:8] if self.git_hash else 'Unknown'}
+Python Version: {sys.version}
+Operating System: {os.name}
+
+Error Details:
+{'=' * 50}
+{error_details}
+
+GUI Output Log:
+{'=' * 50}
+{self.output_text.get(1.0, 'end-1c')}
+"""
+            
+            # Write error log file
+            with open(error_log_path, 'w', encoding='utf-8') as f:
+                f.write(system_info)
+            
+            self.log_output(f"Error log saved: {error_log_path}")
+            
+        except Exception as log_error:
+            self.log_output(f"Failed to create error log: {str(log_error)}")
             
     def open_html_report(self, raw_file_path, output_dir="output"):
         """Open the generated HTML report in the default browser"""
